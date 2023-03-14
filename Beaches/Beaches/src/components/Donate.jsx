@@ -3,41 +3,40 @@ import "./Donate.css";
 import axios from "../context/axios";
 import { AuthContext } from "../context/AuthContext";
 import Navbar from "./Navbar";
-import {ethers} from "ethers";
-
+import { ethers } from "ethers";
 
 const Sell = () => {
   const [PublicAddress, setPublicAddress] = useState(null);
   const [FirstName, setFirstName] = useState(null);
   const [LastName, setLastName] = useState(null);
-  const [Donation, setDonation] = useState(null);
+  const [Donation, setDonation] = useState(0);
   const [Organisation, setOrganisation] = useState(null);
   const [Type, setType] = useState(null);
   const [PhoneNumber, setPhoneNumber] = useState(null);
 
-  const {contract} = useContext(AuthContext);
-  
+  const { contract } = useContext(AuthContext);
+
   async function submitHandler(e) {
     e.preventDefault();
+    let res;
 
-    const transaction = await contract.funding(
-      { value: ethers.utils.parseEther(`0.0000001`) }
-    );
-    const res = await transaction.wait();
-    console.log("transaction : ", res.transactionHash)
-
-
+    try {
+      const transaction = await contract.funding({
+        value: ethers.utils.parseEther(`${Donation}`),
+      });
+      res = await transaction.wait();
+      console.log("transaction : ", res.transactionHash);
+      console.log(res)
+    } catch (error) {
+      alert(error?.code);
+      console.log(error.code);
+      return;
+    }
 
     const sendData = {
       PublicAddress,
-      FirstName,
-      LastName,
-      TransactionHash : res.transactionHash,
+      TransactionHash: res?.transactionHash,
       Donation,
-      Organisation,
-      Type,
-      PhoneNumber,
-
     };
 
     console.log(sendData);
@@ -61,82 +60,18 @@ const Sell = () => {
             <div className="title">Donation Form</div>
             <div className="content">
               <form action="#">
-                <div className="user-details">
-                  <div className="input-box">
-                    <span className="details">Donation Amount</span>
-                    <input
-                      type="Number"
-                      placeholder="Enter your Price"
-                      required
-                      onChange={(e) => setDonation (e.target.value)}
-                    />
-                  </div>
-                  <div className="input-box">
-                    <span className="details">Organisation Name</span>
-                    <input
-                      type="text"
-                      placeholder="Enter your Organisation Name"
-                      required
-                      onChange={(e) => setOrganisation(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-box">
-                    <span className="details">Choose Organisation Type</span>
-                    <select
-                      name="Myproduct"
-                      id="Product"
-                      onChange={(e) => setType(e.target.value)}
-                    >
-                      <option value="">-- Select Type -- </option>
-                      <option value="Private">Private</option>
-                      <option value="Public">Public</option>
-                    </select>
-                  </div>
-                  {/* <div className="input-box">
-                    <span className="details">Quantity</span>
-                    <input
-                      type="Number"
-                      placeholder="Enter your Price"
-                      required
-                      onChange={(e) => setQuantity(e.target.value)}
-                    />
-                  </div> */}
-                  {/* <div className="input-box">
-                    <span className="details">Email</span>
-                    <input
-                      type="text"
-                      placeholder="Enter your Email"
-                      required
-                    />
-                  </div> */}
-                  <div className="input-box">
-                    <span className="details">Phone Number</span>
-                    <input
-                      type="text"
-                      placeholder="Enter your Phone Number"
-                      required
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-box">
-                    <span className="details">First Name</span>
-                    <input
-                      type="text"
-                      placeholder="Enter your First Name"
-                      required
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-box">
-                    <span className="details">Last Name</span>
-                    <input
-                      type="text"
-                      placeholder="Enter your Last Name"
-                      required
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-box">
+                <div 
+                  className="user-details" 
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end"
+                  }}
+                
+                >
+
+
+                <div className="input-box">
                     <span className="details public">Public Address</span>
                     <input
                       type="text"
@@ -146,6 +81,18 @@ const Sell = () => {
                       onChange={(e) => setPublicAddress(e.target.value)}
                     />
                   </div>
+                  <div className="input-box">
+                    <span className="details">Donation Amount</span>
+                    <input
+                      type="Number"
+                      placeholder="Enter your Price"
+                      required
+                      onChange={(e) => setDonation(e.target.value)}
+                    />
+                  </div>
+                 
+                 
+                  
                 </div>
                 <div className="button">
                   <input
